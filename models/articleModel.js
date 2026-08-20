@@ -12,8 +12,16 @@ exports.createArticle = (article, callback) => {
     );
 };
 
-exports.getAllArticles = (callback) => {
-    db.all(`SELECT * FROM articles`, [], callback);
+exports.getAllArticles = (limit, offset, callback) => {
+    db.all(
+        `SELECT * FROM articles LIMIT ? OFFSET ?`,
+        [limit, offset],
+        callback
+    );
+};
+
+exports.countArticles = (callback) => {
+    db.get(`SELECT COUNT(*) AS total FROM articles`, [], callback);
 };
 
 exports.getArticleById = (id, callback) => {

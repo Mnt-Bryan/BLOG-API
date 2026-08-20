@@ -8,9 +8,29 @@ exports.create = (req, res, next) => {
 };
 
 exports.getAll = (req, res, next) => {
-    model.getAllArticles((err, rows) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    model.getAllArticles(limit, offset, (err, rows) => {
         if (err) return next(err);
-        res.json(rows);
+
+        model.countArticles((err, countResult) => {
+            if (err) return next(err);
+
+            const total = countResult.total;
+            const totalPages = Math.ceil(total / limit);
+
+            res.json({
+                data: rows,
+                pagination: {
+                    page,
+                    limit,
+                    total,
+                    totalPages
+                }
+            });
+        });
     });
 };
 
